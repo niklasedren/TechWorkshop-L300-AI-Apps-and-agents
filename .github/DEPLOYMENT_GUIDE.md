@@ -63,7 +63,9 @@ Create the file `SETUP_SECRETS.md` at the repo root (it will be gitignored). You
 ```bash
 # ── Step 3a: Authenticate ────────────────────────────────────────────────────
 az account set --subscription "MCAPS-Hybrid-REQ-146331-2026-niklasedren"
-gh auth login   # choose: GitHub.com → HTTPS → web browser (one-time only)
+
+# Check if gh is already authenticated; if the command exits non-zero, log in.
+gh auth status || gh auth login   # choose: GitHub.com → HTTPS → web browser
 
 # ── Step 3b: Set variables ───────────────────────────────────────────────────
 SUB_ID=$(az account show --query id -o tsv)
