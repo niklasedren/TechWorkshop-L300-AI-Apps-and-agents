@@ -58,3 +58,6 @@ parameters.json
 .azure
 
 .claude/
+
+# Local-only secrets bootstrap guide (never commit this file)
+SETUP_SECRETS.md
