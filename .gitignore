@@ -58,3 +58,6 @@ parameters.json
 .azure
 
 .claude/
+
+# Local-only setup guide (contains resource names — never commit)
+SETUP_SECRETS.md
