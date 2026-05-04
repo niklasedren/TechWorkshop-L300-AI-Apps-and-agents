@@ -73,6 +73,20 @@ resource cosmosDbAccount 'Microsoft.DocumentDB/databaseAccounts@2023-04-15' = {
     databaseAccountOfferType: 'Standard'
     locations: locations
     disableLocalAuth: false
+    // Explicitly enable public access; rely on the IP firewall below to gate it.
+    // Some tenant policies flip this to 'Disabled' if it isn't set explicitly.
+    publicNetworkAccess: 'Enabled'
+    // Allow Azure services and the Azure portal Data Explorer to reach Cosmos
+    // without needing per-IP entries.
+    networkAclBypass: 'AzureServices'
+    // Allowlist only the Container Apps environment's static egress IP. This
+    // creates an implicit dependency so the environment is created first and
+    // its staticIp is available when this resource is evaluated.
+    ipRules: [
+      {
+        ipAddressOrRange: containerAppEnv.properties.staticIp
+      }
+    ]
   }
   tags: tags
 }
