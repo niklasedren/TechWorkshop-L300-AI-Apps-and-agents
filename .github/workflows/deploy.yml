@@ -1,18 +1,21 @@
 # Build, push and deploy the application to Azure Container Apps.
 #
+# Authenticates to Azure via OIDC federated credentials (no client secret).
+#
 # Required GitHub Actions secrets:
-#   AZURE_CREDENTIALS    - Service principal JSON consumed by azure/login
-#   ACR_NAME             - Azure Container Registry name (e.g. "myregistry")
-#   ACR_LOGIN_SERVER     - ACR login server (e.g. "myregistry.azurecr.io")
-#   ACR_USERNAME         - ACR username for docker/login-action
-#   ACR_PASSWORD         - ACR password for docker/login-action
-#   AZURE_RESOURCE_GROUP - Resource group of the existing Container App
-#   CONTAINER_APP_NAME   - Name of the existing Container App
-#   IMAGE_NAME           - Repository/image name within ACR (e.g. "techworkshop-app")
-#   FOUNDRY_ENDPOINT     - Set on the Container App as env var FOUNDRY_ENDPOINT
-#   gpt_endpoint         - Set on the Container App as env var gpt_endpoint
-#   embedding_endpoint   - Set on the Container App as env var embedding_endpoint
-#   phi_4_endpoint       - Set on the Container App as env var phi_4_endpoint
+#   AZURE_CLIENT_ID       - App registration / SP appId for OIDC login
+#   AZURE_TENANT_ID       - Azure tenant id
+#   AZURE_SUBSCRIPTION_ID - Azure subscription id
+#   ACR_LOGIN_SERVER      - ACR login server (e.g. "myregistry.azurecr.io")
+#   ACR_USERNAME          - ACR username for docker/login-action
+#   ACR_PASSWORD          - ACR password for docker/login-action
+#   AZURE_RESOURCE_GROUP  - Resource group of the existing Container App
+#   CONTAINER_APP_NAME    - Name of the existing Container App
+#   IMAGE_NAME            - Repository/image name within ACR (e.g. "techworkshop-app")
+#   FOUNDRY_ENDPOINT      - Set on the Container App as env var FOUNDRY_ENDPOINT
+#   gpt_endpoint          - Set on the Container App as env var gpt_endpoint
+#   embedding_endpoint    - Set on the Container App as env var embedding_endpoint
+#   phi_4_endpoint        - Set on the Container App as env var phi_4_endpoint
 
 name: Build and deploy to Azure Container Apps
 
@@ -37,10 +40,12 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Azure login
+      - name: Azure login (OIDC)
         uses: azure/login@v2
         with:
-          creds: ${{ secrets.AZURE_CREDENTIALS }}
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
       - name: Log in to Azure Container Registry
         uses: docker/login-action@v3
