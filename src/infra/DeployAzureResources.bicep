@@ -76,15 +76,18 @@ resource cosmosDbAccount 'Microsoft.DocumentDB/databaseAccounts@2023-04-15' = {
     // Explicitly enable public access; rely on the IP firewall below to gate it.
     // Some tenant policies flip this to 'Disabled' if it isn't set explicitly.
     publicNetworkAccess: 'Enabled'
-    // Allow Azure services and the Azure portal Data Explorer to reach Cosmos
-    // without needing per-IP entries.
+    // Allow Azure first-party services and the Azure portal Data Explorer to reach
+    // Cosmos without per-IP entries.
     networkAclBypass: 'AzureServices'
-    // Allowlist only the Container Apps environment's static egress IP. This
-    // creates an implicit dependency so the environment is created first and
-    // its staticIp is available when this resource is evaluated.
+    // The single rule '0.0.0.0' is interpreted by Cosmos as "allow requests from
+    // Azure datacenters" (NOT the public internet). This covers the Container Apps
+    // environment's egress IP without needing to reference it directly, which would
+    // create a circular dependency (the Container App already references
+    // cosmosDbAccount.properties.documentEndpoint). Auth still gates all access.
+    // Reference: https://aka.ms/cosmosdb-tsg-forbidden
     ipRules: [
       {
-        ipAddressOrRange: containerAppEnv.properties.staticIp
+        ipAddressOrRange: '0.0.0.0'
       }
     ]
   }
